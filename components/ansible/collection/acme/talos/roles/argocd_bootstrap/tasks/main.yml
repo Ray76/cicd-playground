@@ -1,0 +1,19 @@
+- name: Install or upgrade Argo CD (version from the BOM)
+  ansible.builtin.command: >-
+    helm upgrade --install argocd argo-cd
+    --repo https://argoproj.github.io/argo-helm
+    --version {{ argocdChartVersion }}
+    --namespace argocd --create-namespace
+    --kubeconfig {{ talos_workdir }}/kubeconfig
+    --wait --timeout 10m
+  changed_when: false
+
+- name: Render the root Application
+  ansible.builtin.template:
+    src: root-app.yaml.j2
+    dest: "{{ talos_workdir }}/root-app.yaml"
+    mode: "0644"
+
+- name: Apply the root Application
+  ansible.builtin.command: "kubectl --kubeconfig {{ talos_workdir }}/kubeconfig apply -f {{ talos_workdir }}/root-app.yaml"
+  changed_when: false

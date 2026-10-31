@@ -1,0 +1,19 @@
+- name: Upgrade Talos OS node by node
+  hosts: controlplane:workers
+  serial: 1
+  gather_facts: false
+  connection: local
+  vars: &common
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    talosctl: "talosctl --talosconfig {{ talos_workdir }}/talosconfig"
+    cp_ip: "{{ hostvars[groups['controlplane'][0]]['ansible_host'] }}"
+  roles:
+    - acme.talos.talos_upgrade
+
+- name: Upgrade Kubernetes
+  hosts: controlplane[0]
+  gather_facts: false
+  connection: local
+  vars: *common
+  roles:
+    - acme.talos.k8s_upgrade

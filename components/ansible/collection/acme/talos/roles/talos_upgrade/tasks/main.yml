@@ -1,0 +1,22 @@
+- name: Is this node already part of the cluster?
+  ansible.builtin.command: "{{ talosctl }} -n {{ ansible_host }} version"
+  register: talos_ver
+  failed_when: false
+  changed_when: false
+
+- name: Read the running Talos version (last "Tag:" line = server)
+  ansible.builtin.set_fact:
+    running_talos: >-
+      {{ talos_ver.stdout | regex_findall('Tag: *(v[0-9][0-9a-z.-]*)') | last | default('') }}
+  when: talos_ver.rc == 0
+
+- name: Upgrade Talos to the BOM version
+  ansible.builtin.command: >-
+    {{ talosctl }} -n {{ ansible_host }} upgrade --wait
+    --image factory.talos.dev/metal-installer/{{ talosSchematic }}:{{ talosVersion }}
+  when: talos_ver.rc == 0 and running_talos != talosVersion
+
+- name: Wait for a healthy cluster before the next node
+  ansible.builtin.command: "{{ talosctl }} -n {{ cp_ip }} health --wait-timeout 15m"
+  when: talos_ver.rc == 0 and running_talos != talosVersion
+  changed_when: false

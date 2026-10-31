@@ -1,0 +1,11 @@
+- name: Read the running Kubernetes version
+  ansible.builtin.command: "kubectl --kubeconfig {{ talos_workdir }}/kubeconfig version -o json"
+  register: kv
+  failed_when: false
+  changed_when: false
+
+- name: Upgrade Kubernetes to the BOM version
+  ansible.builtin.command: "{{ talosctl }} -n {{ ansible_host }} upgrade-k8s --to {{ kubernetesVersion }}"
+  when:
+    - kv.rc == 0
+    - (kv.stdout | from_json).serverVersion.gitVersion != 'v' ~ kubernetesVersion

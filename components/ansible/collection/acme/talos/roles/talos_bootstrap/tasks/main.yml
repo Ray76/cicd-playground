@@ -1,0 +1,16 @@
+- name: Bootstrap etcd (only ever succeeds once)
+  ansible.builtin.command: "{{ talosctl }} -n {{ ansible_host }} bootstrap"
+  register: bs
+  until: bs.rc == 0 or 'AlreadyExists' in bs.stderr
+  retries: 20
+  delay: 15
+  failed_when: bs.rc != 0 and 'AlreadyExists' not in bs.stderr
+  changed_when: bs.rc == 0
+
+- name: Wait for a healthy cluster
+  ansible.builtin.command: "{{ talosctl }} -n {{ ansible_host }} health --wait-timeout 15m"
+  changed_when: false
+
+- name: Fetch kubeconfig
+  ansible.builtin.command: "{{ talosctl }} -n {{ ansible_host }} kubeconfig {{ talos_workdir }}/kubeconfig --force"
+  changed_when: false

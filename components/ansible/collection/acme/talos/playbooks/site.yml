@@ -1,0 +1,20 @@
+- name: Configure Talos on every node
+  hosts: controlplane:workers
+  gather_facts: false
+  connection: local
+  vars: &common
+    ansible_python_interpreter: "{{ ansible_playbook_python }}"
+    talosctl: "talosctl --talosconfig {{ talos_workdir }}/talosconfig"
+    cp_ip: "{{ hostvars[groups['controlplane'][0]]['ansible_host'] }}"
+  roles:
+    - acme.talos.talos_config
+    - acme.talos.talos_apply
+
+- name: Bootstrap and hand over to Argo CD
+  hosts: controlplane[0]
+  gather_facts: false
+  connection: local
+  vars: *common
+  roles:
+    - acme.talos.talos_bootstrap
+    - acme.talos.argocd_bootstrap

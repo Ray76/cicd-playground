@@ -1,0 +1,25 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-root
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  sources:
+    - repoURL: {{ platform_repo_url }}
+      targetRevision: v{{ platform }}
+      path: components/addons/platform-addons
+      helm:
+        releaseName: platform-addons
+        valueFiles:
+          - $live/{{ live_values_path }}
+    - repoURL: {{ platform_repo_url }}
+      targetRevision: main
+      ref: live
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

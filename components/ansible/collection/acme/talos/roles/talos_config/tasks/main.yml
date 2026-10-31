@@ -1,0 +1,37 @@
+- name: Secrets directory (lab stand-in for a secrets manager)
+  ansible.builtin.file:
+    path: "{{ talos_secrets_dir }}"
+    state: directory
+    mode: "0700"
+  run_once: true
+
+- name: Generate the cluster secrets bundle once
+  ansible.builtin.command:
+    cmd: "talosctl gen secrets -o {{ talos_secrets_dir }}/secrets.yaml"
+    creates: "{{ talos_secrets_dir }}/secrets.yaml"
+  run_once: true
+
+- name: Render the config patch
+  ansible.builtin.template:
+    src: patch.yaml.j2
+    dest: "{{ talos_workdir }}/patch.yaml"
+    mode: "0600"
+  run_once: true
+
+- name: Generate machine configs for the BOM's Talos and Kubernetes versions
+  ansible.builtin.command: >-
+    talosctl gen config {{ cluster_name }} {{ cluster_endpoint }}
+    --with-secrets {{ talos_secrets_dir }}/secrets.yaml
+    --talos-version {{ talosVersion }}
+    --kubernetes-version {{ kubernetesVersion }}
+    --install-image factory.talos.dev/metal-installer/{{ talosSchematic }}:{{ talosVersion }}
+    --install-disk {{ talos_install_disk }}
+    --config-patch @{{ talos_workdir }}/patch.yaml
+    --output-dir {{ talos_workdir }} --force
+  changed_when: false
+  run_once: true
+
+- name: Point talosconfig at the control plane
+  ansible.builtin.command: "{{ talosctl }} config endpoint {{ cp_ip }}"
+  changed_when: false
+  run_once: true

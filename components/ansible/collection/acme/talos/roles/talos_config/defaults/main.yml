@@ -1,0 +1,3 @@
+talos_secrets_dir: "{{ lookup('env', 'HOME') }}/.platform-lab/secrets/{{ cluster_name }}"
+talos_install_disk: /dev/vda
+allow_scheduling_on_cp: true   # single-node lab clusters

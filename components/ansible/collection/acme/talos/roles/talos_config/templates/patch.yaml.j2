@@ -1,0 +1,5 @@
+cluster:
+  allowSchedulingOnControlPlanes: {{ allow_scheduling_on_cp | bool | lower }}
+machine:
+  nodeLabels:
+    platform.acme/release: "{{ platform }}"

@@ -1,0 +1,5 @@
+# What a platform release brings besides the code in components/.
+talosVersion: v1.14.2          # use the latest 1.13.x patch
+talosSchematic: 376567988ad370138ad8b2698212367b8edcb69b5fd68c80be1f2ec7d603b4ba  # vanilla Talos, no extensions
+kubernetesVersion: 1.36.3      # use the latest 1.36.x patch
+argocdChartVersion: "10.11.6"    # from helm search above

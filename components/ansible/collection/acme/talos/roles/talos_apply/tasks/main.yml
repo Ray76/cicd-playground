@@ -1,0 +1,25 @@
+- name: Pick the machine config for this node's role
+  ansible.builtin.set_fact:
+    node_config: "{{ talos_workdir }}/{{ 'controlplane' if 'controlplane' in group_names else 'worker' }}.yaml"
+
+- name: Does the node already trust our talosconfig?
+  ansible.builtin.command: "{{ talosctl }} -n {{ ansible_host }} version"
+  register: talos_auth
+  failed_when: false
+  changed_when: false
+
+- name: First apply (maintenance mode)
+  ansible.builtin.command: "talosctl apply-config --insecure -n {{ ansible_host }} --file {{ node_config }}"
+  when: talos_auth.rc != 0
+
+- name: Re-apply (authenticated)
+  ansible.builtin.command: "{{ talosctl }} apply-config -n {{ ansible_host }} --file {{ node_config }}"
+  when: talos_auth.rc == 0
+
+- name: Wait until the node answers with our credentials
+  ansible.builtin.command: "{{ talosctl }} -n {{ ansible_host }} version"
+  register: talos_up
+  until: talos_up.rc == 0
+  retries: 60
+  delay: 10
+  changed_when: false

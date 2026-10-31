@@ -1,0 +1,5 @@
+namespace: acme
+name: talos
+version: 0.1.0 # kept equal to the git tag when you cut a release
+readme: README.md
+authors: [platform-team]

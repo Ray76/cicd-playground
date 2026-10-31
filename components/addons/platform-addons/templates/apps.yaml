@@ -1,0 +1,28 @@
+{{- range $name, $app := .Values.apps }}
+{{- if $app.enabled }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $name }}
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: {{ $app.repoURL }}
+    chart: {{ $app.chart }}
+    targetRevision: {{ $app.version | quote }}
+    helm:
+      valuesObject:
+        {{- toYaml $app.values | nindent 8 }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {{ $app.namespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+{{- end }}
+{{- end }}
