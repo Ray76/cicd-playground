@@ -1,0 +1,5 @@
+apps:
+  podinfo:
+    values:
+      ui:
+        color: "#c62828"   # red = prod
