@@ -8,5 +8,5 @@ apps:
     values:
       replicaCount: 1
       ui:
-        message: "platform release 0.1.0"
+        message: "platform release 0.2.0"
         color: "#34577c"

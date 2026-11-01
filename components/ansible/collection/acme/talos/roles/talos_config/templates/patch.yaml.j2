@@ -3,3 +3,5 @@ cluster:
 machine:
   nodeLabels:
     platform.acme/release: "{{ platform }}"
+  sysctls:
+    vm.max_map_count: "262144"
