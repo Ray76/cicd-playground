@@ -27,5 +27,5 @@ variable "pool" {
 
 variable "disk_gb" {
   type    = number
-  default = 5
+  default = 10
 }

@@ -1,4 +1,4 @@
 collections:
-  - name: https://github.com/Ray76/platform-lab.git#/components/ansible/collection/acme/talos
+  - name: https://github.com/Ray76/cicd-playground.git#/components/ansible/collection/acme/talos
     type: git
     version: v0.1.0

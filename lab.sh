@@ -23,9 +23,9 @@ play() {
 case $CMD in
   up)
     IMAGE=$(scripts/fetch-image.sh "$WORK/bom.yaml")
-    terraform -chdir="$CDIR/terraform" init -input=false -upgrade
-    terraform -chdir="$CDIR/terraform" apply -auto-approve -var "boot_image=$IMAGE"
-    terraform -chdir="$CDIR/terraform" output -json nodes | jq '{all:{children:{
+    tofu -chdir="$CDIR/terraform" init -input=false -upgrade
+    tofu -chdir="$CDIR/terraform" apply -auto-approve -var "boot_image=$IMAGE"
+    tofu -chdir="$CDIR/terraform" output -json nodes | jq '{all:{children:{
       controlplane:{hosts:(with_entries(select(.value.role=="controlplane"))|map_values({ansible_host:.ip}))},
       workers:{hosts:(with_entries(select(.value.role=="worker"))|map_values({ansible_host:.ip}))}}}}' \
       > "$WORK/inventory.json"
@@ -35,7 +35,7 @@ case $CMD in
     play site      # Talos config, bootstrap, Argo CD
     ;;
   down)
-    terraform -chdir="$CDIR/terraform" destroy -auto-approve -var "boot_image=unused"
+    tofu -chdir="$CDIR/terraform" destroy -auto-approve -var "boot_image=unused"
     rm -rf "$WORK"
     ;;
   *) echo "usage: $0 up|down <env> <cluster>"; exit 1 ;;
