@@ -25,7 +25,7 @@ variable "nodes" {
 }
 
 module "cluster" {
-  source       = "git::https://github.com/Ray76/cicd-playground.git//components/terraform/modules/lab-cluster?ref=v0.1.0"
+  source       = "git::https://github.com/Ray76/cicd-playground.git//components/terraform/modules/lab-cluster?ref=v0.2.1"
   cluster_name = var.cluster_name
   cidr         = var.cidr
   nodes        = var.nodes
