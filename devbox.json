@@ -7,10 +7,11 @@
     "kubectl@latest",
     "kubernetes-helm@latest",
     "yq-go@latest",
-    "bat@latest"
+    "bat@latest",
+    "argocd@latest"
   ],
   "env": {
-    "LANG": "C.UTF-8",
+    "LANG":   "C.UTF-8",
     "LC_ALL": "C.UTF-8"
   },
   "shell": {

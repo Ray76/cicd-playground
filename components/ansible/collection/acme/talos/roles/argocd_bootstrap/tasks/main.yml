@@ -8,12 +8,18 @@
     --wait --timeout 10m
   changed_when: false
 
-- name: Render the root Application
+- name: Render the chart repository and the root Application
   ansible.builtin.template:
-    src: root-app.yaml.j2
-    dest: "{{ talos_workdir }}/root-app.yaml"
+    src: "{{ item }}.j2"
+    dest: "{{ talos_workdir }}/{{ item }}"
     mode: "0644"
+  loop:
+    - chart-repo.yaml
+    - root-app.yaml
 
-- name: Apply the root Application
-  ansible.builtin.command: "kubectl --kubeconfig {{ talos_workdir }}/kubeconfig apply -f {{ talos_workdir }}/root-app.yaml"
+- name: Apply them (repository first)
+  ansible.builtin.command: "kubectl --kubeconfig {{ talos_workdir }}/kubeconfig apply -f {{ talos_workdir }}/{{ item }}"
+  loop:
+    - chart-repo.yaml
+    - root-app.yaml
   changed_when: false
